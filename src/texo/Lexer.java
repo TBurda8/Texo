@@ -1,6 +1,8 @@
 package texo;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import static texo.TokenType.*;
 
 class Lexer {
@@ -12,9 +14,7 @@ class Lexer {
     }
 
     List<Token> scanTokens() {
-        int whiteSp = 0;
-        while (whiteSp < 3) {
-            if ()
-        }
+        tokens.add(new Token(EOF, "", null, 1, 1));
+        return tokens;
     }
 }

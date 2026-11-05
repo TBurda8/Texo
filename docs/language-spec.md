@@ -63,7 +63,7 @@ Current proposed rules:
 | `end` | Terminates a block |
 | `print` | Writes to standard output |
 | `if` | Begins conditional execution |
-| `than` | Begins a conditional block |
+| `then` | Begins a conditional block |
 | `else` | Introduces an alternative conditional branch |
 | `while` | Begins a conditional loop |
 | `do` | Begins a loop body |
@@ -178,7 +178,7 @@ if condition, statement;
 **Multiline form:**
 
 ```texo
-if condition than
+if condition then
     statements
 else
     statements
