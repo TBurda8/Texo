@@ -1,6 +1,9 @@
 package texo;
 
 import org.junit.jupiter.api.Test;
+import texo.Lexer;
+import texo.Token;
+import texo.TokenType;
 
 import java.util.List;
 
