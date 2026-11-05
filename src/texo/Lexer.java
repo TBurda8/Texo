@@ -189,7 +189,7 @@ class Lexer {
     private void scanString() {
         while (peek() != '"' && !isAtEnd()) {
             if (peek() == '\n') {
-                reportError("Unfinished string.");
+                reportError("Unterminated string.");
                 return;
             }
 
@@ -197,7 +197,7 @@ class Lexer {
         }
 
         if (isAtEnd()) {
-            reportError("Unfinished string.");
+            reportError("Unterminated string.");
             return;
         }
 
@@ -228,7 +228,7 @@ class Lexer {
             advance();
         }
 
-        reportError("Unfinished multiline comment.");
+        reportError("Unterminated multiline comment.");
     }
 
     private final List<String> errors = new ArrayList<>();
