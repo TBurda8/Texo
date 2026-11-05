@@ -1,0 +1,11 @@
+# Lexer test
+
+start demo in(a, b)
+    result = a * 2.5 + b;
+
+    if result >= 10 then
+        print "large";
+    else
+        print "small";
+    end
+end
