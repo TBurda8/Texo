@@ -145,7 +145,7 @@ class LexerTest {
 
         assertTrue(lexer.hasErrors());
         assertTrue(
-                lexer.getErrors().get(0).contains("Unterminated string")
+                lexer.getErrors().get(0).contains("Unterminated string.")
         );
     }
 
@@ -157,7 +157,7 @@ class LexerTest {
 
         assertTrue(lexer.hasErrors());
         assertTrue(
-                lexer.getErrors().get(0).contains("Unterminated multiline comment")
+                lexer.getErrors().get(0).contains("Unterminated multiline comment.")
         );
     }
 
