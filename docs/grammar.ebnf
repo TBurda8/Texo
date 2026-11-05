@@ -1,37 +1,133 @@
-program = {function} ;
+(* =========================================
+   Texo program structure
+   ========================================= *)
 
-digit = "0" | "1" | "2" | "3" | "4"
-      | "5" | "6" | "7" | "8" | "9" ;
+program = {function_declaration | statement} ;
 
-integer = digit, {digit} ;
+function_declaration =
+    "start", identifier,
+    [ "in", "(", [ parameter_list ], ")" ],
+    { statement },
+    "end" ;
 
-letter = "a" | "b" | ... | "z"
-       | "A" | "B" | ... | "Z" ;
+parameter_list =
+    identifier, { ",", identifier } ;
 
-identifier = letter, {letter | digit | "_"} ;
+(* =========================================
+   Statements
+   ========================================= *)
 
-assignment = identifier, "=", expression ;
+statement =
+      print_statement
+    | input_statement
+    | if_statement
+    | while_statement
+    | return_statement
+    | expression_statement ;
 
-expression = term, {("+" | "-"), term} ;
+print_statement =
+    "print", expression, ";" ;
 
-term = factor, {("*" | "/"), factor} ;
+input_statement =
+    "put", identifier, ";" ;
 
-factor = integer
-       | identifier
-       | "(", expression, ")" ;
+return_statement =
+    "out", expression, ";" ;
 
-print_statement = "print", expression ;
+expression_statement =
+    expression, ";" ;
 
-function = "start", identifier,
-           ["in", parameter_list],
-           newline,
-           {statement},
-           "end" ;
+if_statement =
+    "if", expression, "then",
+    { statement },
+    [ "else", { statement } ],
+    "end" ;
 
-parameter_list = identifier, {",", identifier} ;
+while_statement =
+    "while", expression, "do",
+    { statement },
+    "end" ;
 
-statement = assignment
-          | print_statement
-          | return_statement ;
+(* =========================================
+   Expressions, ordered by precedence
+   ========================================= *)
 
-return_statement = "out", expression ;
+expression =
+    assignment ;
+
+assignment =
+      identifier, "=", assignment
+    | equality ;
+
+equality =
+    comparison,
+    { ( "==" | "!=" ), comparison } ;
+
+comparison =
+    term,
+    { ( ">" | ">=" | "<" | "<=" ), term } ;
+
+term =
+    factor,
+    { ( "+" | "-" ), factor } ;
+
+factor =
+    unary,
+    { ( "*" | "/" ), unary } ;
+
+unary =
+      ( "!" | "-" ), unary
+    | call ;
+
+call =
+    primary,
+    { "(", [ argument_list ], ")" } ;
+
+argument_list =
+    expression,
+    { ",", expression } ;
+
+primary =
+      number
+    | string
+    | boolean
+    | identifier
+    | "(", expression, ")" ;
+
+(* =========================================
+   Lexical forms
+   ========================================= *)
+
+boolean =
+      "true"
+    | "false" ;
+
+number =
+    integer,
+    [ ".", digit, { digit } ] ;
+
+integer =
+    digit, { digit } ;
+
+digit =
+      "0" | "1" | "2" | "3" | "4"
+    | "5" | "6" | "7" | "8" | "9" ;
+
+identifier =
+    ( letter | "_" ),
+    { letter | digit | "_" } ;
+
+letter =
+      "a" | "b" | "c" | "d" | "e" | "f"
+    | "g" | "h" | "i" | "j" | "k" | "l"
+    | "m" | "n" | "o" | "p" | "q" | "r"
+    | "s" | "t" | "u" | "v" | "w" | "x"
+    | "y" | "z"
+    | "A" | "B" | "C" | "D" | "E" | "F"
+    | "G" | "H" | "I" | "J" | "K" | "L"
+    | "M" | "N" | "O" | "P" | "Q" | "R"
+    | "S" | "T" | "U" | "V" | "W" | "X"
+    | "Y" | "Z" ;
+
+string =
+    ? a double-quoted sequence containing no newline ? ;

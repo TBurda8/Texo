@@ -198,39 +198,13 @@ end
 *To be specified.*
 
 ## 7. Formal Grammar
-```
-digit = "0" | "1" | "2" | "3" | "4" 
-      | "5" | "6" | "7" | "8" | "9" ;
-     
-integer = digit, {digit} ;
 
-letter = "a" | "b" | ... | "z"
-       | "A" | "B" | ... | "Z" ;
-       
-identifier = letter, {letter | digit | "_"} ;
+The canonical Texo grammar is maintained in
+[`docs/grammar.ebnf`](grammar.ebnf).
 
-expression = term, {("+" | "-"), term} ;
-
-term = factor, {("*" | "/"), factor} ;
-
-factor = integer | identifier | "(", expression, ")" ;
-
-print_statement = "print", expression ;
-
-function = "start", identifier,
-           ["in", parameter_list],
-           newline,
-           {statement},
-           "end" ;
-           
-parameter_list = identifier, {",", identifier} ;
-
-statement = assignment
-          | print_statement
-          | return_statement ;
-
-return_statement = "out", expression ;
-```
+Rules such as variable existence, function arity, and valid `out`
+placement are enforced during parsing or interpretation rather than
+by the formal grammar.
 
 ## 8. Error Handling
 
