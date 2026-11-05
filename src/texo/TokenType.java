@@ -1,19 +1,21 @@
 package texo;
 
 public enum TokenType {
-    // Single Char Tokens
-    LEFT_PARAN, RIGHT_PARAN, COMMA, ASSIGN, SEMICOLON,
+    // Punctuation
+    LEFT_PAREN, RIGHT_PAREN, COMMA, SEMICOLON,
 
-    // Two Char Tokens + <>
-    EQUAL_EQUAL, GREATER, LESS, GREATER_EQUAL, LESS_EQUAL, BANG, BANG_EQUAL,
+    // One or two char operators
+    ASSIGN, EQUAL_EQUAL, GREATER, LESS, GREATER_EQUAL,
+    LESS_EQUAL, BANG, BANG_EQUAL,
 
     // Keywords
-    IF, THAN, ELSE, WHILE, DO, START, IN, OUT, END, PRINT,
+    IF, THEN, ELSE, WHILE, DO, START, IN, OUT, END, PRINT,
+    PUT, TRUE, FALSE,
 
     // Literals
     IDENTIFIER, NUMBER, STRING,
 
-    // Operators
+    // Arithmetic Operators
     ADD, SUBTRACT, MULTIPLY, DIVIDE,
 
     // End of File
