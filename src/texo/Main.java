@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 public class Main {
     private static final int EXIT_USAGE_ERROR = 64;
@@ -40,6 +41,13 @@ public class Main {
     }
 
     private static void run(String source) {
-        System.out.println("Loaded Texo source (" + source.length() + " characters).");
+        Lexer lexer = new Lexer(source);
+        List<Token> tokens = lexer.scanTokens();
+
+        if (lexer.hasErrors()) {
+            lexer.getErrors().forEach(System.err::println);
+            return;
+        }
+        tokens.forEach(System.out::println);
     }
 }

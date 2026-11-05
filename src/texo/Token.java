@@ -14,4 +14,11 @@ public class Token {
         this.line = line;
         this.col = col;
     }
+
+    @Override
+    public String toString() {
+        return type + " '" + text + "'"
+                + (literal == null ? "" : " " + literal)
+                + " at " + line + ":" + col;
+    }
 }
