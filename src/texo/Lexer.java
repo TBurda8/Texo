@@ -28,7 +28,7 @@ class Lexer {
 
             scanToken();
         }
-        tokens.add(new Token(EOF, "", null, 1, 1));
+        tokens.add(new Token(EOF, "", null, line, column));
         return tokens;
     }
 
