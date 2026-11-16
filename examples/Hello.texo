@@ -3,4 +3,4 @@ start greeting
     print "Welcome to Texo!";
 end
 
-greeting;
+greeting();
