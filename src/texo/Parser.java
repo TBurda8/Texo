@@ -33,7 +33,27 @@ class Parser {
     }
 
     private Expr expression() {
-        return equality();
+        return assignment();
+    }
+
+    private Expr assignment() {
+        Expr expression = equality();
+
+        if (match(ASSIGN)) {
+            Token equals = previous();
+            Expr value = assignment();
+
+            if (expression instanceof Expr.Variable variable) {
+                return new Expr.Assign(
+                        variable.name(),
+                        value
+                );
+            }
+
+            throw error(equals, "Invalid assignment target.");
+        }
+
+        return expression;
     }
 
     private Expr equality() {
@@ -96,7 +116,31 @@ class Parser {
             return new Expr.Unary(operator, right);
         }
 
-        return primary();
+        return call();
+    }
+
+    private Expr call() {
+        Expr expression = primary();
+
+        while (match(LEFT_PAREN)) {
+            expression = finishCall(expression);
+        }
+
+        return expression;
+    }
+
+    private Expr finishCall(Expr callee) {
+        List<Expr> arguements = new ArrayList<>();
+
+        if (!check(RIGHT_PAREN)) {
+            do {
+                arguements.add(expression());
+            } while (match(COMMA));
+        }
+
+        Token closingParen = consume(RIGHT_PAREN, "Expected ')' after function args.");
+
+        return new Expr.Call(callee, closingParen, arguements);
     }
 
     private Expr primary() {
