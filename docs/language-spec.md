@@ -189,6 +189,11 @@ end
 
 *Syntax and behavior to be specified.*
 
+### 4.6 Input
+
+The `put` statement takes input. It automatically converts to boolean if the input
+is true or false, than converts to number for numbers, than to a string. 
+
 ## 5. Types and Values
 
 *To be specified.*

@@ -6,15 +6,20 @@ import java.util.List;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.io.StringReader;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class InterpreterTest {
 
     private String runProgram(String source) {
+        return runProgram(source, "");
+    }
+
+    private String runProgram(String source, String input) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 
-        Interpreter interpreter = new Interpreter(new PrintStream(bytes));
+        Interpreter interpreter = new Interpreter(new StringReader(input), new PrintStream(bytes));
 
         interpreter.interpret(parseProgram(source));
 
@@ -208,6 +213,42 @@ class InterpreterTest {
         );
 
         assertEquals("Conditions must evaluate to a boolean.", error.getMessage());
+    }
+
+    @Test
+    void readsInput() {
+        assertEquals("""
+                Guy Name
+                20
+                accepted
+                """, runProgram("""
+                put name;
+                put number;
+                put accepted;
+                
+                print name;
+                print number + 1;
+                
+                if accepted then
+                    print "accepted";
+                end
+                """, """
+                Guy Name
+                19
+                true
+                """));
+    }
+
+    @Test
+    void reportsMissingPut() {
+        RuntimeError error = assertThrows(
+                RuntimeError.class, () -> runProgram("""
+                        put name;
+                        print name;
+                        """)
+        );
+
+        assertEquals("No input available for 'name'.", error.getMessage());
     }
 
 }
