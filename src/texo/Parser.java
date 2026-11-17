@@ -15,6 +15,84 @@ class Parser {
         this.tokens = tokens;
     }
 
+    List<Stmt> parse() {
+        List<Stmt> statements = new ArrayList<>();
+
+        while (!isAtEnd()) {
+            try {
+                statements.add(statement());
+            } catch (ParseError ignored) {
+                synchronize();
+            }
+        }
+
+        return List.copyOf(statements);
+    }
+
+    private Stmt statement() {
+        if (match(PRINT)) {
+            return printStatement();
+        }
+
+        if (match(PUT)) {
+            return inputStatement();
+        }
+
+        if (match(OUT)) {
+            return returnStatement();
+        }
+
+        return expressionStatement();
+    }
+
+    private Stmt printStatement() {
+        Expr value = expression();
+
+        consume(SEMICOLON, "Expected ';' after printed expression.");
+
+        return new Stmt.Print(value);
+    }
+
+    private Stmt inputStatement() {
+        Token name = consume(IDENTIFIER, "Expected variable name after 'put'.");
+
+        consume(SEMICOLON, "Expected ';' after input statement.");
+
+        return new Stmt.Input(name);
+    }
+
+    private Stmt returnStatement() {
+        Token keyword = previous();
+        Expr value = expression();
+
+        consume(SEMICOLON, "Expected ';' after returned expression.");
+
+        return new Stmt.Return(keyword, value);
+    }
+
+    private Stmt expressionStatement() {
+        Expr expression = expression();
+
+        consume(SEMICOLON, "Expected ';' after expression.");
+
+        return new Stmt.Expression(expression);
+    }
+
+    private void synchronize() {
+        while (!isAtEnd()) {
+            if (current > 0 && previous().type == SEMICOLON) {
+                return;
+            }
+
+            switch (peek().type) {
+                case PRINT, PUT, OUT, IF, WHILE, START -> {
+                    return;
+                }
+                default -> advance();
+            }
+        }
+    }
+
     Expr parseExpression() {
         try {
             Expr result = expression();
@@ -130,17 +208,17 @@ class Parser {
     }
 
     private Expr finishCall(Expr callee) {
-        List<Expr> arguements = new ArrayList<>();
+        List<Expr> arguments = new ArrayList<>();
 
         if (!check(RIGHT_PAREN)) {
             do {
-                arguements.add(expression());
+                arguments.add(expression());
             } while (match(COMMA));
         }
 
         Token closingParen = consume(RIGHT_PAREN, "Expected ')' after function args.");
 
-        return new Expr.Call(callee, closingParen, arguements);
+        return new Expr.Call(callee, closingParen, arguments);
     }
 
     private Expr primary() {
