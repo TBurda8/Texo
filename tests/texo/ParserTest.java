@@ -265,4 +265,57 @@ class ParserTest {
         assertTrue(parser.getErrors().stream().anyMatch(error ->
                 error.contains("Expected 'end' after function body.")));
     }
+
+    @Test
+    void parsesIfStatement() {
+        List<Stmt> statements = parseProgram("""
+                if score >= 10 then
+                    print "big";
+                end
+                """);
+
+        assertEquals(1, statements.size());
+
+        Stmt.If ifStatement = assertInstanceOf(Stmt.If.class, statements.getFirst());
+
+        Expr.Binary condition = assertInstanceOf(Expr.Binary.class, ifStatement.condition());
+
+        assertEquals(GREATER_EQUAL, condition.operator().type);
+        assertEquals(1, ifStatement.thenBranch().size());
+        assertTrue(ifStatement.elseBranch().isEmpty());
+        assertInstanceOf(Stmt.Print.class, ifStatement.thenBranch().getFirst());
+    }
+
+    @Test
+    void parsesIfElse() {
+        List<Stmt> statements = parseProgram("""
+                if score >= 10 then
+                    print "big";
+                else
+                    print "small";
+                end
+                """);
+        Stmt.If ifStatement = assertInstanceOf(Stmt.If.class, statements.getFirst());
+
+        assertEquals(1, ifStatement.thenBranch().size());
+        assertEquals(1, ifStatement.elseBranch().size());
+
+        assertInstanceOf(Stmt.Print.class, ifStatement.thenBranch().getFirst());
+        assertInstanceOf(Stmt.Print.class, ifStatement.elseBranch().getFirst());
+    }
+
+    @Test
+    void missingThen() {
+        Parser parser = createParser("""
+                if true
+                    print "hello";
+                end
+                """);
+
+        parser.parse();
+
+        assertTrue(parser.hasErrors());
+        assertTrue(parser.getErrors().stream().anyMatch(error ->
+                error.contains("Expected 'then' after if condition.")));
+    }
 }

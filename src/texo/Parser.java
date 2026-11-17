@@ -30,6 +30,10 @@ class Parser {
     }
 
     private Stmt statement() {
+        if (match(IF)) {
+            return ifStatement();
+        }
+
         if (match(PRINT)) {
             return printStatement();
         }
@@ -43,6 +47,23 @@ class Parser {
         }
 
         return expressionStatement();
+    }
+
+    private Stmt ifStatement() {
+        Expr condition = expression();
+
+        consume(THEN, "Expected 'then' after if condition.");
+
+        List<Stmt> thenBranch = statementsUntil(ELSE, END);
+        List<Stmt> elseBranch = List.of();
+
+        if (match(ELSE)) {
+            elseBranch = statementsUntil(END);
+        }
+
+        consume(END, "Expected 'end' after if statement.");
+
+        return new Stmt.If(condition, thenBranch, elseBranch);
     }
 
     private Stmt printStatement() {
