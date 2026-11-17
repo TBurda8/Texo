@@ -20,7 +20,7 @@ class Parser {
 
         while (!isAtEnd()) {
             try {
-                statements.add(statement());
+                statements.add(declaration());
             } catch (ParseError ignored) {
                 synchronize();
             }
@@ -76,6 +76,56 @@ class Parser {
         consume(SEMICOLON, "Expected ';' after expression.");
 
         return new Stmt.Expression(expression);
+    }
+
+    private Stmt declaration() {
+        if (match(START)) {
+            return functionDeclaration();
+        }
+        return statement();
+    }
+
+    private Stmt functionDeclaration() {
+        Token name = consume(IDENTIFIER, "Expected function name after 'start'.");
+        List<Token> parameters = new ArrayList<>();
+
+        if (match(IN)) {
+            consume(LEFT_PAREN, "Expected '(' after 'in'.");
+
+            if (!check(RIGHT_PAREN)) {
+                do {
+                    parameters.add(consume(IDENTIFIER, "Expected parameter name."));
+                } while (match(COMMA));
+            }
+
+            consume(RIGHT_PAREN, "Expected ')' after parameters.");
+        }
+
+        List<Stmt> body = statementsUntil(END);
+
+        consume(END, "Expected 'end' after function body.");
+
+        return new Stmt.Function(name, parameters, body);
+    }
+
+    private List<Stmt> statementsUntil(TokenType... terminators) {
+        List<Stmt> statements = new ArrayList<>();
+
+        while (!isAtEnd() && !checkAny(terminators)) {
+            statements.add(statement());
+        }
+
+        return statements;
+    }
+
+    private boolean checkAny(TokenType... types) {
+        for (TokenType type : types) {
+            if (check(type)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void synchronize() {
