@@ -3,21 +3,37 @@ package texo;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Objects;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 
 class Interpreter {
     private final Environment environment;
     private final PrintStream output;
+    private final BufferedReader input;
 
     Interpreter() {
-        this(new Environment(), System.out);
+        this(new Environment(),
+                new InputStreamReader(System.in, StandardCharsets.UTF_8),
+                System.out);
     }
 
     Interpreter(PrintStream output) {
-        this(new Environment(), output);
+        this(new Environment(),
+                new InputStreamReader(System.in, StandardCharsets.UTF_8),
+                output);
     }
 
-    Interpreter(Environment environment, PrintStream output) {
+    Interpreter(Reader input, PrintStream output) {
+        this(new Environment(), input, output);
+    }
+
+    Interpreter(Environment environment, Reader input, PrintStream output) {
         this.environment = environment;
+        this.input = new BufferedReader(input);
         this.output = output;
     }
 
@@ -154,6 +170,11 @@ class Interpreter {
             return;
         }
 
+        if (statement instanceof Stmt.Input inputStatement) {
+            readInput(inputStatement.name());
+            return;
+        }
+
         if (statement instanceof Stmt.Print print) {
             Object value = evaluate(print.expression());
             output.println(stringify(value));
@@ -183,6 +204,42 @@ class Interpreter {
         }
 
         throw new RuntimeError("Conditions must evaluate to a boolean.");
+    }
+
+    private void readInput(Token name) {
+        try {
+            String line = input.readLine();
+
+            if (line == null) {
+                throw new RuntimeError(
+                        name, "No input available for '" + name.text + "'."
+                );
+            }
+
+            environment.assign(name, parseInputValue(line));
+        } catch (IOException exception) {
+            throw new RuntimeError(
+                    name, "Could not read input for '" + name.text + "'."
+            );
+        }
+    }
+
+    private Object parseInputValue(String line) {
+        String trimmed = line.trim();
+
+        if (trimmed.equals("true")) {
+            return true;
+        }
+
+        if (trimmed.equals("false")) {
+            return false;
+        }
+
+        try {
+            return Double.parseDouble(trimmed);
+        } catch (NumberFormatException ignored) {
+            return line;
+        }
     }
 
 }
