@@ -28,7 +28,7 @@ class ExprTest {
     }
 
     @Test
-    void copiesFunctionArguements() {
+    void copiesFunctionArguments() {
         Token name = new Token(
                 IDENTIFIER,
                 "multiply",
@@ -56,7 +56,7 @@ class ExprTest {
 
         Expr.Call functionCall = (Expr.Call) call;
 
-        assertEquals(2, functionCall.arguements().size());
+        assertEquals(2, functionCall.arguments().size());
         assertEquals("multiply", ((Expr.Variable) functionCall.callee()).name().text);
     }
 }

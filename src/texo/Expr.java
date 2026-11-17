@@ -27,10 +27,10 @@ sealed interface Expr permits
     record Call(
             Expr callee,
             Token closingParenthesis,
-            List<Expr> arguements
+            List<Expr> arguments
     ) implements Expr {
         public Call {
-            arguements = List.copyOf(arguements);
+            arguments = List.copyOf(arguments);
         }
     }
 
