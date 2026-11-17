@@ -318,4 +318,43 @@ class ParserTest {
         assertTrue(parser.getErrors().stream().anyMatch(error ->
                 error.contains("Expected 'then' after if condition.")));
     }
+
+    @Test
+    void parsesWhileStatement() {
+        List<Stmt> statements = parseProgram("""
+                while count < 10 do
+                    print count;
+                    count = count + 1;
+                end
+                """);
+
+        assertEquals(1, statements.size());
+
+        Stmt.While whileStatement = assertInstanceOf(Stmt.While.class, statements.getFirst());
+
+        Expr.Binary condition = assertInstanceOf(Expr.Binary.class, whileStatement.condition());
+
+        assertEquals(LESS, condition.operator().type);
+        assertEquals(2, whileStatement.body().size());
+
+        assertInstanceOf(Stmt.Print.class, whileStatement.body().get(0));
+
+        Stmt.Expression assignmentStatement = assertInstanceOf(Stmt.Expression.class, whileStatement.body().get(1));
+
+        assertInstanceOf(Expr.Assign.class, assignmentStatement.expression());
+    }
+
+    @Test
+    void reportsNoDo() {
+        Parser parser = createParser("""
+                while count < 10
+                    print count;
+                end
+                """);
+
+        parser.parse();
+        assertTrue(parser.hasErrors());
+        assertTrue(parser.getErrors().stream().anyMatch(error ->
+                error.contains("Expected 'do' after while condition.")));
+    }
 }

@@ -34,6 +34,10 @@ class Parser {
             return ifStatement();
         }
 
+        if (match(WHILE)) {
+            return whileStatement();
+        }
+
         if (match(PRINT)) {
             return printStatement();
         }
@@ -64,6 +68,18 @@ class Parser {
         consume(END, "Expected 'end' after if statement.");
 
         return new Stmt.If(condition, thenBranch, elseBranch);
+    }
+
+    private Stmt whileStatement() {
+        Expr condition = expression();
+
+        consume(DO, "Expected 'do' after while condition.");
+
+        List<Stmt> body = statementsUntil(END);
+
+        consume(END, "Expected 'end' after while statement.");
+
+        return new Stmt.While(condition, body);
     }
 
     private Stmt printStatement() {
