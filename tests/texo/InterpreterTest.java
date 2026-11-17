@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class InterpreterTest {
 
-    private Object evaluate(String source) {
+    private Expr parseExpression(String source) {
         Lexer lexer = new Lexer(source);
         List<Token> tokens = lexer.scanTokens();
 
@@ -19,7 +19,11 @@ class InterpreterTest {
 
         assertFalse(parser.hasErrors(), String.join("\n", parser.getErrors()));
 
-        return new Interpreter().evaluate(expression);
+        return expression;
+    }
+
+    private Object evaluate(String source) {
+        return new Interpreter().evaluate(parseExpression(source));
     }
 
     @Test

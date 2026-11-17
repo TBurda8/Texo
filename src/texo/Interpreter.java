@@ -3,8 +3,29 @@ package texo;
 import java.util.Objects;
 
 class Interpreter {
+    private final Enviroment enviroment;
+
+    Interpreter() {
+        this(new Enviroment());
+    }
+
+    Interpreter(Enviroment enviroment) {
+        this.enviroment = enviroment;
+    }
 
     Object evaluate(Expr expression) {
+        if (expression instanceof Expr.Variable variable) {
+            return enviroment.get(variable.name());
+        }
+
+        if (expression instanceof Expr.Assign assignment) {
+            Object value = evaluate(assignment.value());
+
+            enviroment.assign(assignment.name(), value);
+
+            return value;
+        }
+
         if (expression instanceof Expr.Literal literal) {
             return literal.value();
         }
