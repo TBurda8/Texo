@@ -150,8 +150,14 @@ class Parser {
     }
 
     private void synchronize() {
+        if (isAtEnd()) {
+            return;
+        }
+
+        advance();
+
         while (!isAtEnd()) {
-            if (current > 0 && previous().type == SEMICOLON) {
+            if (previous().type == SEMICOLON) {
                 return;
             }
 
