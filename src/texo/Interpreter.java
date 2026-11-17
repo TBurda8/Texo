@@ -134,6 +134,26 @@ class Interpreter {
             return;
         }
 
+        if (statement instanceof Stmt.If conditional) {
+            boolean condition = requireCondition(evaluate(conditional.condition()));
+
+            if (condition) {
+                executeBlock(conditional.thenBranch());
+            } else {
+                executeBlock(conditional.elseBranch());
+            }
+
+            return;
+        }
+
+        if (statement instanceof Stmt.While loop) {
+            while (requireCondition(evaluate(loop.condition()))) {
+                executeBlock(loop.body());
+            }
+
+            return;
+        }
+
         if (statement instanceof Stmt.Print print) {
             Object value = evaluate(print.expression());
             output.println(stringify(value));
@@ -149,6 +169,20 @@ class Interpreter {
         }
 
         return String.valueOf(value);
+    }
+
+    private void executeBlock(List<Stmt> statements) {
+        for (Stmt statement : statements) {
+            execute(statement);
+        }
+    }
+
+    private boolean requireCondition(Object value) {
+        if (value instanceof Boolean bool) {
+            return bool;
+        }
+
+        throw new RuntimeError("Conditions must evaluate to a boolean.");
     }
 
 }
