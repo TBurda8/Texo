@@ -3,7 +3,7 @@ package texo;
 import java.util.HashMap;
 import java.util.Map;
 
-class Enviroment {
+class Environment {
     private final Map<String, Object> values = new HashMap<>();
 
     Object get(Token name) {

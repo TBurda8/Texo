@@ -1,27 +1,35 @@
 package texo;
 
+import java.io.PrintStream;
+import java.util.List;
 import java.util.Objects;
 
 class Interpreter {
-    private final Enviroment enviroment;
+    private final Environment environment;
+    private final PrintStream output;
 
     Interpreter() {
-        this(new Enviroment());
+        this(new Environment(), System.out);
     }
 
-    Interpreter(Enviroment enviroment) {
-        this.enviroment = enviroment;
+    Interpreter(PrintStream output) {
+        this(new Environment(), output);
+    }
+
+    Interpreter(Environment environment, PrintStream output) {
+        this.environment = environment;
+        this.output = output;
     }
 
     Object evaluate(Expr expression) {
         if (expression instanceof Expr.Variable variable) {
-            return enviroment.get(variable.name());
+            return environment.get(variable.name());
         }
 
         if (expression instanceof Expr.Assign assignment) {
             Object value = evaluate(assignment.value());
 
-            enviroment.assign(assignment.name(), value);
+            environment.assign(assignment.name(), value);
 
             return value;
         }
@@ -112,6 +120,35 @@ class Interpreter {
         throw new RuntimeError(
                 operator, "Operator '" + operator.text + "' requires a boolean."
         );
+    }
+
+    void interpret(List<Stmt> statements) {
+        for (Stmt statement : statements) {
+            execute(statement);
+        }
+    }
+
+    private void execute(Stmt statement) {
+        if (statement instanceof Stmt.Expression expression) {
+            evaluate(expression.expression());
+            return;
+        }
+
+        if (statement instanceof Stmt.Print print) {
+            Object value = evaluate(print.expression());
+            output.println(stringify(value));
+            return;
+        }
+
+        throw new IllegalStateException("Unsupported statement: " + statement.getClass().getSimpleName());
+    }
+
+    private String stringify(Object value) {
+        if (value instanceof Double number && number == Math.rint(number)) {
+            return Long.toString(number.longValue());
+        }
+
+        return String.valueOf(value);
     }
 
 }
