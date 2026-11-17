@@ -114,7 +114,7 @@ class InterpreterTest {
     void executesAssignAndPrint() {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 
-        Interpreter interpreter = new Interpreter();
+        Interpreter interpreter = new Interpreter(new PrintStream(bytes));
 
         interpreter.interpret(parseProgram("""
                 score = 10;
@@ -130,7 +130,7 @@ class InterpreterTest {
     void printsTexoValues() {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 
-        Interpreter interpreter = new Interpreter();
+        Interpreter interpreter = new Interpreter(new PrintStream(bytes));
 
         interpreter.interpret(parseProgram("""
                 print "hello";
