@@ -203,4 +203,66 @@ class ParserTest {
         assertInstanceOf(Expr.Assign.class, first.expression());
         assertInstanceOf(Expr.Call.class, second.expression());
     }
+
+    @Test
+    void parsesFuncDeclaration() {
+        List<Stmt> statements = parseProgram("""
+                start multiply in(a, b)
+                    out a * b;
+                end
+                """);
+
+        assertEquals(1, statements.size());
+
+        Stmt.Function function = assertInstanceOf(Stmt.Function.class, statements.getFirst());
+
+        assertEquals("multiply", function.name().text);
+        assertEquals(2, function.parameters().size());
+        assertEquals("a", function.parameters().get(0).text);
+        assertEquals("b", function.parameters().get(1).text);
+        assertEquals(1, function.body().size());
+
+        Stmt.Return retStatment = assertInstanceOf(Stmt.Return.class, function.body().getFirst());
+
+        Expr.Binary multi = assertInstanceOf(Expr.Binary.class, retStatment.value());
+
+        assertEquals(MULTIPLY, multi.operator().type);
+    }
+
+    @Test
+    void parseFunctionNoParameters() {
+        List<Stmt> statements = parseProgram("""
+                start greeting
+                    print "Hello";
+                end
+                
+                greeting();
+                """);
+
+        assertEquals(2, statements.size());
+
+        Stmt.Function function = assertInstanceOf(Stmt.Function.class, statements.get(0));
+
+        assertEquals("greeting", function.name().text);
+        assertTrue(function.parameters().isEmpty());
+        assertEquals(1, function.body().size());
+
+        Stmt.Expression callStmt = assertInstanceOf(Stmt.Expression.class, statements.get(1));
+
+        assertInstanceOf(Expr.Call.class, callStmt.expression());
+    }
+
+    @Test
+    void reportMissingEnd() {
+        Parser parser = createParser("""
+                start broken
+                    print "Missing end";
+                """);
+
+        parser.parse();
+
+        assertTrue(parser.hasErrors());
+        assertTrue(parser.getErrors().stream().anyMatch(error ->
+                error.contains("Expected 'end' after function body.")));
+    }
 }
