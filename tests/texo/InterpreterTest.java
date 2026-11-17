@@ -62,4 +62,35 @@ class InterpreterTest {
 
         assertEquals("Cannot divide by zero.", error.getMessage());
     }
+
+    @Test
+    void storesAndUpdatesVar() {
+        Interpreter interpreter = new Interpreter();
+
+        Object first = interpreter.evaluate(parseExpression("num = 10"));
+        Object second = interpreter.evaluate(parseExpression("num = num + 5"));
+        assertEquals(10.0, first);
+        assertEquals(15.0, second);
+    }
+
+    @Test
+    void chainDeclaration() {
+        Interpreter interpreter = new Interpreter();
+
+        assertEquals(10.0, interpreter.evaluate(parseExpression("a = b = 10")));
+        assertEquals(10.0, interpreter.evaluate(parseExpression("a")));
+        assertEquals(10.0, interpreter.evaluate(parseExpression("b")));
+    }
+
+    @Test
+    void undefinedVar() {
+        Interpreter interpreter = new Interpreter();
+
+        RuntimeError error = assertThrows(RuntimeError.class, () -> interpreter.evaluate(
+                parseExpression("missing")
+        ));
+
+        assertEquals("Undefined variable 'missing'.", error.getMessage());
+    }
+
 }
