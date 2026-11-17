@@ -93,4 +93,72 @@ class ParserTest {
 
         assertTrue(parser.getErrors().get(0).contains("Expected ')'"));
     }
+
+    @Test
+    void parsesFunctionCall() {
+        Expr expression = parse("multiply(2, 3 + 4)");
+
+        assertInstanceOf(Expr.Call.class, expression);
+
+        Expr.Call call = (Expr.Call) expression;
+
+        assertInstanceOf(Expr.Variable.class, call.callee());
+
+        Expr.Variable callee = (Expr.Variable) call.callee();
+
+        assertEquals("multiply", callee.name().text);
+        assertEquals(2, call.arguements().size());
+
+        assertEquals(2.0, ((Expr.Literal) call.arguements().get(0)).value());
+
+        assertInstanceOf(Expr.Binary.class, call.arguements().get(1));
+
+        Expr.Binary addition = (Expr.Binary) call.arguements().get(1);
+
+        assertEquals(ADD, addition.operator().type);
+    }
+
+    @Test
+    void parseAssign() {
+        Expr expression = parse("result = 2 + 3");
+
+        assertInstanceOf(Expr.Assign.class, expression);
+
+        Expr.Assign assignment = (Expr.Assign) expression;
+
+        assertEquals("result", assignment.name().text);
+
+        assertInstanceOf(Expr.Binary.class, assignment.value());
+
+        Expr.Binary addition = (Expr.Binary) assignment.value();
+
+        assertEquals(ADD, addition.operator().type);
+    }
+
+    @Test
+    void assignmentGoesRight() {
+        Expr expression = parse("a = b = 10");
+
+        Expr.Assign first = (Expr.Assign) expression;
+
+        assertEquals("a", first.name().text);
+        assertInstanceOf(Expr.Assign.class, first.value());
+
+        Expr.Assign second = (Expr.Assign) first.value();
+
+        assertEquals("b", second.name().text);
+        assertEquals(10.0, ((Expr.Literal) second.value()).value());
+    }
+
+    @Test
+    void badAssignTarget() {
+        Parser parser = createParser("(2 + 3) = 10");
+
+        Expr expression = parser.parseExpression();
+
+        assertNull(expression);
+        assertTrue(parser.hasErrors());
+
+        assertTrue(parser.getErrors().get(0).contains("Invalid assignment target"));
+    }
 }
