@@ -33,6 +33,20 @@ class ParserTest {
         return expression;
     }
 
+    private List<Stmt> parseProgram(String source) {
+        Lexer lexer = new Lexer(source);
+        List<Token> tokens = lexer.scanTokens();
+
+        assertFalse(lexer.hasErrors(), String.join("\n", lexer.getErrors()));
+
+        Parser parser = new Parser(tokens);
+        List<Stmt> statements = parser.parse();
+
+        assertFalse(parser.hasErrors(), String.join("\n", parser.getErrors()));
+
+        return statements;
+    }
+
     @Test
     void precedenceTest() {
         Expr expression = parse("2 + 3 * 4");
@@ -160,5 +174,33 @@ class ParserTest {
         assertTrue(parser.hasErrors());
 
         assertTrue(parser.getErrors().get(0).contains("Invalid assignment target"));
+    }
+
+    @Test
+    void parsePrint() {
+        List<Stmt> statements = parseProgram("print 2 + 3;");
+
+        assertEquals(1, statements.size());
+        assertInstanceOf(Stmt.Print.class, statements.get(0));
+
+        Stmt.Print print = (Stmt.Print) statements.get(0);
+
+        assertInstanceOf(Expr.Binary.class, print.expression());
+    }
+
+    @Test
+    void parseMultipleStatements() {
+        List<Stmt> statements = parseProgram("""
+                result = 10;
+                multiply(result);
+                """);
+
+        assertEquals(2, statements.size());
+
+        Stmt.Expression first = (Stmt.Expression) statements.get(0);
+        Stmt.Expression second = (Stmt.Expression) statements.get(1);
+
+        assertInstanceOf(Expr.Assign.class, first.expression());
+        assertInstanceOf(Expr.Call.class, second.expression());
     }
 }
