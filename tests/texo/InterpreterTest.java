@@ -11,6 +11,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class InterpreterTest {
 
+    private String runProgram(String source) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+
+        Interpreter interpreter = new Interpreter(new PrintStream(bytes));
+
+        interpreter.interpret(parseProgram(source));
+
+        return bytes.toString(StandardCharsets.UTF_8).replace("\r\n", "\n");
+    }
+
     private List<Stmt> parseProgram(String source) {
         Lexer lexer = new Lexer(source);
         List<Token> tokens = lexer.scanTokens();
@@ -147,6 +157,57 @@ class InterpreterTest {
                 2.5
                 2
                 """, result);
+    }
+
+    @Test
+    void correctIf() {
+        assertEquals("""
+                large
+                small
+                """, runProgram("""
+                score = 12;
+                
+                if score >= 10 then
+                    print "large";
+                else
+                    print "wrong";
+                end
+                
+                if score < 10 then
+                    print "wrong";
+                else
+                    print "small";
+                end
+                """));
+    }
+
+    @Test
+    void executesWhile() {
+        assertEquals("""
+                0
+                1
+                2
+                """, runProgram("""
+                count = 0;
+                
+                while count < 3 do
+                    print count;
+                    count = count + 1;
+                end
+                """));
+    }
+
+    @Test
+    void noNonBoolConditions() {
+        RuntimeError error = assertThrows(
+                RuntimeError.class, () -> runProgram("""
+                        if 10 then
+                            print "invalid";
+                        end
+                        """)
+        );
+
+        assertEquals("Conditions must evaluate to a boolean.", error.getMessage());
     }
 
 }
