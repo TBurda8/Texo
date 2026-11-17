@@ -107,13 +107,13 @@ class ParserTest {
         Expr.Variable callee = (Expr.Variable) call.callee();
 
         assertEquals("multiply", callee.name().text);
-        assertEquals(2, call.arguements().size());
+        assertEquals(2, call.arguments().size());
 
-        assertEquals(2.0, ((Expr.Literal) call.arguements().get(0)).value());
+        assertEquals(2.0, ((Expr.Literal) call.arguments().get(0)).value());
 
-        assertInstanceOf(Expr.Binary.class, call.arguements().get(1));
+        assertInstanceOf(Expr.Binary.class, call.arguments().get(1));
 
-        Expr.Binary addition = (Expr.Binary) call.arguements().get(1);
+        Expr.Binary addition = (Expr.Binary) call.arguments().get(1);
 
         assertEquals(ADD, addition.operator().type);
     }
