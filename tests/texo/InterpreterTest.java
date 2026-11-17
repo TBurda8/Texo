@@ -3,10 +3,27 @@ package texo;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class InterpreterTest {
+
+    private List<Stmt> parseProgram(String source) {
+        Lexer lexer = new Lexer(source);
+        List<Token> tokens = lexer.scanTokens();
+
+        assertFalse(lexer.hasErrors(), String.join("\n", lexer.getErrors()));
+
+        Parser parser = new Parser(tokens);
+        List<Stmt> statements = parser.parse();
+
+        assertFalse(parser.hasErrors(), String.join("\n", parser.getErrors()));
+
+        return statements;
+    }
 
     private Expr parseExpression(String source) {
         Lexer lexer = new Lexer(source);
@@ -91,6 +108,45 @@ class InterpreterTest {
         ));
 
         assertEquals("Undefined variable 'missing'.", error.getMessage());
+    }
+
+    @Test
+    void executesAssignAndPrint() {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+
+        Interpreter interpreter = new Interpreter();
+
+        interpreter.interpret(parseProgram("""
+                score = 10;
+                score = score + 5;
+                print score;
+                """));
+        String result = bytes.toString(StandardCharsets.UTF_8).replace("\r\n", "\n");
+
+        assertEquals("15\n", result);
+    }
+
+    @Test
+    void printsTexoValues() {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+
+        Interpreter interpreter = new Interpreter();
+
+        interpreter.interpret(parseProgram("""
+                print "hello";
+                print true;
+                print 2.5;
+                print 2;
+                """));
+
+        String result = bytes.toString(StandardCharsets.UTF_8).replace("\r\n", "\n");
+
+        assertEquals("""
+                hello
+                true
+                2.5
+                2
+                """, result);
     }
 
 }
