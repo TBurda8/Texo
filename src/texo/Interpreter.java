@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 
@@ -166,8 +165,12 @@ class Interpreter {
     }
 
     void interpret(List<Stmt> statements) {
-        for (Stmt statement : statements) {
-            execute(statement);
+        try {
+            for (Stmt statement : statements) {
+                execute(statement);
+            }
+        } catch (ReturnSignal returned) {
+            throw new RuntimeError(returned.keyword, "'out' can only be used inside a function.");
         }
     }
 
@@ -181,6 +184,12 @@ class Interpreter {
             TexoFunction callable = new TexoFunction(function, environment);
             environment.assign(function.name(), callable);
             return;
+        }
+
+        if (statement instanceof Stmt.Return returned) {
+            Object value = evaluate(returned.value());
+
+            throw new ReturnSignal(returned.keyword(), value);
         }
 
         if (statement instanceof Stmt.If conditional) {
