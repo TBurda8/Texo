@@ -1,7 +1,7 @@
 
 # Texo Language Specification
 
-**Version:** 0.1.0 (Draft)  
+**Version:** 1.0.0  
 **Status:** In development
 
 ## 1. Language Overview
@@ -12,7 +12,7 @@ Texo is a general-purpose programming language with lightweight syntax designed 
 
 The language emphasizes minimal boilerplate, consistent constructs, implicit variable declarations, and explicitly terminated blocks. Many declarations and operations are organized around the `in` and `out` keywords.
 
-Texo will use a **tree-walk interpreter written in Java**. Source code will be tokenized, parsed into an **abstract syntax tree (AST)**, and then interpreted.
+Texo uses a **tree-walk interpreter written in Java**. Source code will be tokenized, parsed into an **abstract syntax tree (AST)**, and then interpreted.
 
 ### 1.2 Language Characteristics
 
@@ -47,7 +47,7 @@ It can span several lines.
 
 Identifiers name variables and functions. They are **case-sensitive** and cannot be reserved keywords.
 
-Current proposed rules:
+Current rules:
 
 - The first character must be a letter or underscore (`_`).
 - Subsequent characters may include letters, digits, and underscores.
@@ -106,13 +106,13 @@ Texo will support standard arithmetic operations, including addition, subtractio
 
 ### 3.2 Operator Precedence
 
-Standard arithmetic precedence is planned. Parentheses override the usual order of operations.
+Standard arithmetic precedence. Parentheses override the usual order of operations.
 
 | Operator | Type | Associativity |
 | --- | --- | ---|
 | () | Grouping | left-to-right |
-| ! & ~ ++ | Unary Operators | right-to-left |
-| * / % | Arithmetic Operators | left-to-right|
+| ! - | Unary Operators | right-to-left |
+| * / | Arithmetic Operators | left-to-right|
 | + - | Arithmetic Operators | left-to-right |
 
 
@@ -192,7 +192,7 @@ end
 ### 4.6 Input
 
 The `put` statement takes input. It automatically converts to boolean if the input
-is true or false, than converts to number for numbers, than to a string. 
+is true or false, then converts to number for numbers, then to a string. 
 
 ## 5. Types and Values
 

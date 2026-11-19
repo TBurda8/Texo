@@ -240,7 +240,7 @@ class Interpreter {
         }
     }
 
-    public void executeBlock(List<Stmt> statements, Environment environment) {
+    void executeBlock(List<Stmt> statements, Environment environment) {
         Environment previous = this.environment;
 
         try {

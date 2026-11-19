@@ -1,10 +1,18 @@
 # Texo
 
+## What Texo is
+
 Texo is a experimental intrepreted programming language built from scratch in Java as a CS final project. 
-The goal is to design a small readable language and to implement all systems needed to use it, like a lexer, parser, ASTs, and a intrepreter. 
-Texo will run source files from the terminal.
+Right now, it is a small readable language and uses a lexer, parser, ASTs, and a intrepreter. 
+Texo runs source files from the terminal.
 
 ![System diagram](docs/Project_Diagram.png)
+
+## V1 Features
+
+Texo can currently use functions, variables, has error reporting, and uses a runtime enviroment for scope.
+It can also do the typical stuff you would expect a basic language to do, like math. 
+More documentation is in the docs folder.
 
 ## Tech Stack
 
@@ -14,6 +22,8 @@ Texo will run source files from the terminal.
 
 ## Setup
 
+Requirements: JDK 17+, Bash
+
 ```bash
 git clone https://github.com/TBurda8/Texo
 cd texo
@@ -21,25 +31,25 @@ javac -d out src/texo/*.java
 java -cp out texo.Main
 ```
 
-A bash launcher is planned for future versions.
-
 ## Usage
 
 ```bash
-java -cp out texo.Main examples/hello.texo
+git clone https://github.com/TBurda8/Texo.git
+cd Texo
+./scripts/run.sh examples/hello.texo
 ```
 
-## Roadmap
+## Future Roadmap
 
-- [ ] Define languague grammar and syntax
-- [ ] Implement lexer and tokenizer
-- [ ] Develop parser
-- [ ] Implement ASTs
-- [ ] Support for variables and expressions
-- [ ] Support conditionals and loops
-- [ ] Support errors
-- [ ] Implement functions and recursion
-- [ ] Support scope
+- [x] Define languague grammar and syntax
+- [x] Implement lexer and tokenizer
+- [x] Develop parser
+- [x] Implement ASTs
+- [x] Support for variables and expressions
+- [x] Support conditionals and loops
+- [x] Support errors
+- [x] Implement functions and recursion
+- [x] Support scope
 
 ## Documentation
 

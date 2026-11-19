@@ -3,6 +3,8 @@
 *.jar
 out/
 build/
+tmp/
+lib/
 
 # IntelliJ
 .idea/
