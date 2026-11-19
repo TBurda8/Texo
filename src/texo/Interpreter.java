@@ -3,6 +3,7 @@ package texo;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Objects;
+import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,7 +12,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 
 class Interpreter {
-    private final Environment environment;
+    private Environment environment;
     private final PrintStream output;
     private final BufferedReader input;
 
@@ -40,6 +41,10 @@ class Interpreter {
     Object evaluate(Expr expression) {
         if (expression instanceof Expr.Variable variable) {
             return environment.get(variable.name());
+        }
+
+        if (expression instanceof  Expr.Call call) {
+            return evaluateCall(call);
         }
 
         if (expression instanceof Expr.Assign assignment) {
@@ -106,6 +111,28 @@ class Interpreter {
         };
     }
 
+    private Object evaluateCall(Expr.Call expression) {
+        Object callee = evaluate(expression.callee());
+
+        if (!(callee instanceof TexoCallable function)) {
+            throw new RuntimeError(expression.closingParenthesis(), "Can only call functions.");
+        }
+
+        List<Object> arguments = new ArrayList<>();
+
+        for (Expr argument : expression.arguments()) {
+            arguments.add(evaluate(argument));
+        }
+
+        if (arguments.size() != function.arity()) {
+            throw new RuntimeError(
+                    expression.closingParenthesis(),
+                    "Expected " + function.arity() + " arguments but received " + arguments.size() + "."
+            );
+        }
+        return function.call(this, arguments);
+    }
+
     private double divide(Token operator, Object left, Object right) {
         double divisor = requireNumber(operator, right);
 
@@ -147,6 +174,12 @@ class Interpreter {
     private void execute(Stmt statement) {
         if (statement instanceof Stmt.Expression expression) {
             evaluate(expression.expression());
+            return;
+        }
+
+        if (statement instanceof Stmt.Function function) {
+            TexoFunction callable = new TexoFunction(function, environment);
+            environment.assign(function.name(), callable);
             return;
         }
 
@@ -195,6 +228,20 @@ class Interpreter {
     private void executeBlock(List<Stmt> statements) {
         for (Stmt statement : statements) {
             execute(statement);
+        }
+    }
+
+    private void executeBlock(List<Stmt> statements, Environment environment) {
+        Environment previous = this.environment;
+
+        try {
+            this.environment = environment;
+
+            for (Stmt statement : statements) {
+                execute(statement);
+            }
+        } finally {
+            this.environment = previous;
         }
     }
 
