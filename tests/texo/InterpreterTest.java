@@ -298,4 +298,62 @@ class InterpreterTest {
         assertEquals("Can only call functions.", error.getMessage());
     }
 
+    @Test
+    void functionReturnsVal() {
+        assertEquals("""
+                20
+                """, runProgram("""
+                start multiply in(a, b)
+                    out a * b;
+                end
+                
+                print multiply(4, 5);
+                """));
+    }
+
+    @Test
+    void returnStopsFunction() {
+        assertEquals("""
+                before
+                5
+                """, runProgram("""
+                start example
+                    print "before";
+                    out 5;
+                    print after;
+                end
+                
+                print example();
+                """));
+    }
+
+    @Test
+    void functionRecursion() {
+        assertEquals("""
+                24
+                """, runProgram("""
+                start factorial in(number)
+                    if number <= 1 then
+                        out 1;
+                    end
+                    
+                    out number * factorial(number - 1);
+                end
+                
+                print factorial(4);
+                """));
+    }
+
+    @Test
+    void noReturnOutOfFunc() {
+        RuntimeError error = assertThrows(
+                RuntimeError.class,
+                () -> runProgram("""
+                        out 5;
+                        """)
+        );
+
+        assertEquals("'out' can only be used inside a function.", error.getMessage());
+    }
+
 }
