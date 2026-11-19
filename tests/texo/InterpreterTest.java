@@ -251,4 +251,51 @@ class InterpreterTest {
         assertEquals("No input available for 'name'.", error.getMessage());
     }
 
+    @Test
+    void callsFunctionLocalScope() {
+        assertEquals("""
+                5
+                100
+                """, runProgram("""
+                value = 100;
+                
+                start show in(value)
+                    value = value + 1;
+                    print value;
+                end
+                
+                show(4);
+                print value;
+                """));
+    }
+
+    @Test
+    void rejectBadArgs() {
+        RuntimeError error = assertThrows(
+                RuntimeError.class,
+                () -> runProgram("""
+                        start greet in(name)
+                            print name;
+                        end
+                        
+                        greet();
+                        """)
+        );
+
+        assertEquals("Expected 1 arguments but received 0.", error.getMessage());
+    }
+
+    @Test
+    void rejectsCallingNotFunc() {
+        RuntimeError error = assertThrows(
+                RuntimeError.class,
+                () -> runProgram("""
+                        number = 10;
+                        number();
+                        """)
+        );
+
+        assertEquals("Can only call functions.", error.getMessage());
+    }
+
 }

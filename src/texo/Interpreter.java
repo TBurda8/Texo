@@ -225,13 +225,13 @@ class Interpreter {
         return String.valueOf(value);
     }
 
-    private void executeBlock(List<Stmt> statements) {
+    void executeBlock(List<Stmt> statements) {
         for (Stmt statement : statements) {
             execute(statement);
         }
     }
 
-    private void executeBlock(List<Stmt> statements, Environment environment) {
+    public void executeBlock(List<Stmt> statements, Environment environment) {
         Environment previous = this.environment;
 
         try {
